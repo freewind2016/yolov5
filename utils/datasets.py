@@ -335,7 +335,7 @@ class LoadStreams:  # multiple IP or RTSP cameras
 def img2label_paths(img_paths):
     # Define label paths as a function of image paths
     sa, sb = os.sep + 'images' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
-    return [x.replace(sa, sb, 1).replace('.' + x.split('.')[-1], '.txt') for x in img_paths]
+    return ['txt'.join(x.replace(sa, sb, 1).rsplit(x.split('.')[-1], 1)) for x in img_paths]
 
 
 class LoadImagesAndLabels(Dataset):  # for training/testing
@@ -666,7 +666,7 @@ def load_mosaic(self, index):
     labels4, segments4 = [], []
     s = self.img_size
     yc, xc = [int(random.uniform(-x, 2 * s + x)) for x in self.mosaic_border]  # mosaic center x, y
-    indices = [index] + [self.indices[random.randint(0, self.n - 1)] for _ in range(3)]  # 3 additional image indices
+    indices = [index] + random.choices(self.indices, k=3)  # 3 additional image indices
     for i, index in enumerate(indices):
         # Load image
         img, _, (h, w) = load_image(self, index)
@@ -721,7 +721,7 @@ def load_mosaic9(self, index):
 
     labels9, segments9 = [], []
     s = self.img_size
-    indices = [index] + [self.indices[random.randint(0, self.n - 1)] for _ in range(8)]  # 8 additional image indices
+    indices = [index] + random.choices(self.indices, k=8)  # 8 additional image indices
     for i, index in enumerate(indices):
         # Load image
         img, _, (h, w) = load_image(self, index)
